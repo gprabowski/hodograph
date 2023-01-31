@@ -24,8 +24,6 @@ struct gui_info {
 
 std::string gui_info::file_error_message{""};
 
-
-
 void ShowDemo_RealtimePlots() {
   static ScrollingBuffer sdata1;
   static RollingBuffer rdata1;
@@ -162,10 +160,10 @@ void update_viewport_info(std::function<void(void)> process_input) {
                                                      tmp.y + min.y};
 
   ImVec2 cp = {chosen_api::last_frame_info::right_viewport_pos.x,
-        chosen_api::last_frame_info::right_viewport_pos.y};
+               chosen_api::last_frame_info::right_viewport_pos.y};
 
   ImVec2 ca = {chosen_api::last_frame_info::right_viewport_area.x,
-        chosen_api::last_frame_info::right_viewport_area.y};
+               chosen_api::last_frame_info::right_viewport_area.y};
 
   if (ImGui::IsMouseHoveringRect(cp, {cp.x + ca.x, cp.y + ca.y})) {
     process_input();
@@ -196,7 +194,10 @@ void render_simulation_gui(internal::model &model) {
   ImGui::Begin("Hodograph Settings");
   ImGui::SliderFloat("l1", &model.hodograph.l1, 1.f, model.hodograph.l2 - 1);
   ImGui::SliderFloat("l2", &model.hodograph.l2, 1.f, 50.f);
-  ImGui::SliderFloat("omega", &model.hodograph.omega, 0.f, 20 * glm::pi<float>());
+  ImGui::SliderFloat("omega", &model.hodograph.omega, 0.f,
+                     20 * glm::pi<float>());
+
+  ImGui::SliderFloat("Epsilon zero", &model.hodograph.epsilon0, 0.f, 10.f);
 
   ImGui::End();
 
@@ -210,40 +211,47 @@ void render_simulation_gui(internal::model &model) {
   static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels;
 
   if (ImPlot::BeginPlot("x(t)", ImVec2(-1, 150))) {
-      ImPlot::SetupAxes(NULL, NULL, flags, flags);
-      ImPlot::SetupAxisLimits(ImAxis_X1, 0, history, ImGuiCond_Always);
-      ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100);
-      ImPlot::PlotLine("x(t)", &model.xgraph_data.Data[0].x, &model.xgraph_data.Data[0].y,
-          model.xgraph_data.Data.size(), 0, 0, 2 * sizeof(float));
-      ImPlot::EndPlot();
+    ImPlot::SetupAxes(NULL, NULL, flags, flags);
+    ImPlot::SetupAxisLimits(ImAxis_X1, 0, history, ImGuiCond_Always);
+    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100);
+    ImPlot::PlotLine("x(t)", &model.xgraph_data.Data[0].x,
+                     &model.xgraph_data.Data[0].y,
+                     model.xgraph_data.Data.size(), 0, 0, 2 * sizeof(float));
+    ImPlot::EndPlot();
   }
 
   if (ImPlot::BeginPlot("dx(t)", ImVec2(-1, 150))) {
-      ImPlot::SetupAxes(NULL, NULL, flags, flags);
-      ImPlot::SetupAxisLimits(ImAxis_X1, 0, history, ImGuiCond_Always);
-      ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100);
-      ImPlot::PlotLine("dx(t)", &model.dxgraph_data.Data[0].x, &model.dxgraph_data.Data[0].y,
-          model.dxgraph_data.Data.size(), 0, 0, 2 * sizeof(float));
-      ImPlot::EndPlot();
+    ImPlot::SetupAxes(NULL, NULL, flags, flags);
+    ImPlot::SetupAxisLimits(ImAxis_X1, 0, history, ImGuiCond_Always);
+    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100);
+    ImPlot::PlotLine("dx(t)", &model.dxgraph_data.Data[0].x,
+                     &model.dxgraph_data.Data[0].y,
+                     model.dxgraph_data.Data.size(), 0, 0, 2 * sizeof(float));
+    ImPlot::EndPlot();
   }
 
   if (ImPlot::BeginPlot("ddx(t)", ImVec2(-1, 150))) {
-      ImPlot::SetupAxes(NULL, NULL, flags, flags);
-      ImPlot::SetupAxisLimits(ImAxis_X1, 0, history, ImGuiCond_Always);
-      ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100);
-      ImPlot::PlotLine("ddx(t)", &model.ddxgraph_data.Data[0].x, &model.ddxgraph_data.Data[0].y,
-          model.ddxgraph_data.Data.size(), 0, 0, 2 * sizeof(float));
-      ImPlot::EndPlot();
+    ImPlot::SetupAxes(NULL, NULL, flags, flags);
+    ImPlot::SetupAxisLimits(ImAxis_X1, 0, history, ImGuiCond_Always);
+    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100);
+    ImPlot::PlotLine("ddx(t)", &model.ddxgraph_data.Data[0].x,
+                     &model.ddxgraph_data.Data[0].y,
+                     model.ddxgraph_data.Data.size(), 0, 0, 2 * sizeof(float));
+    ImPlot::EndPlot();
   }
 
   if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, 150))) {
-      ImPlot::SetupAxes(NULL, NULL, flags, flags);
-      ImPlot::SetupAxisLimits(ImAxis_X1, -10, model.hodograph.l1 + model.hodograph.l2 + 10, ImGuiCond_Always);
-      ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 16.f);
-      ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
-      ImPlot::PlotLine("dx(x)", &model.dxxgraph_data.Data[0].x, &model.dxxgraph_data.Data[0].y,
-          model.dxxgraph_data.Data.size(), 0, model.dxxgraph_data.Offset, 2 * sizeof(float));
-      ImPlot::EndPlot();
+    ImPlot::SetupAxes(NULL, NULL, flags, flags);
+    ImPlot::SetupAxisLimits(ImAxis_X1, -10,
+                            model.hodograph.l1 + model.hodograph.l2 + 10,
+                            ImGuiCond_Always);
+    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 16.f);
+    ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
+    ImPlot::PlotLine("dx(x)", &model.dxxgraph_data.Data[0].x,
+                     &model.dxxgraph_data.Data[0].y,
+                     model.dxxgraph_data.Data.size(), 0,
+                     model.dxxgraph_data.Offset, 2 * sizeof(float));
+    ImPlot::EndPlot();
   }
 
   ImGui::End();

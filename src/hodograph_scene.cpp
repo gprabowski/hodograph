@@ -87,6 +87,7 @@ void hodograph_scene::render(input_state &input) {
                      4 * (model.hodograph.l1 * model.hodograph.l1 -
                           model.hodograph.l2 * model.hodograph.l2);
   if (delta < 0) {
+    LOGGER_ERROR("DELTA NEGATIVE!!!");
     throw;
   }
 
