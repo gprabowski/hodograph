@@ -22,10 +22,11 @@ namespace internal {
 //    * API object reference
 
 struct hodograph_state {
-    float l1{ 5.f };
-    float l2{ 10.f };
-    float omega{ 1.f };
-    float angle{ 0.f };
+  float l1{5.f};
+  float l2{10.f};
+  float omega{1.f};
+  float angle{0.f};
+  float epsilon0{1e-3f};
 };
 
 struct light {
@@ -45,7 +46,6 @@ struct scene_grid {
 
 struct hodograph_geometry {
   api_agnostic_geometry unit_cyllinder;
-
 
   void clear() {
     unit_cyllinder.vertices.clear();
@@ -68,20 +68,21 @@ struct model {
   RollingBuffer ddxgraph_data;
   ScrollingBuffer dxxgraph_data;
 
-  float t{ 0.f };
+  float t{0.f};
 
   inline void reset() {
     geometry.clear();
 
-    auto rot_m = glm::toMat4(glm::quat({ 0.f, -glm::pi<float>() / 2.f, 0.f }));
+    auto rot_m = glm::toMat4(glm::quat({0.f, -glm::pi<float>() / 2.f, 0.f}));
     mock_data::build_vertices_helper(
-        50, 1.f, 1.f, geometry.unit_cyllinder.vertices, geometry.unit_cyllinder.indices,
-        rot_m, {0.8f, 0.8f, 0.8f});
+        50, 1.f, 1.f, geometry.unit_cyllinder.vertices,
+        geometry.unit_cyllinder.indices, rot_m, {0.8f, 0.8f, 0.8f});
 
-    
-    glfw_impl::fill_renderable(geometry.unit_cyllinder.vertices, geometry.unit_cyllinder.indices,
+    glfw_impl::fill_renderable(geometry.unit_cyllinder.vertices,
+                               geometry.unit_cyllinder.indices,
                                renderable.unit_cyllinder);
-    glfw_impl::add_program_to_renderable("resources/model", renderable.unit_cyllinder);
+    glfw_impl::add_program_to_renderable("resources/model",
+                                         renderable.unit_cyllinder);
   }
 };
 
